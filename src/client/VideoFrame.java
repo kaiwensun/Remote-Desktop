@@ -1,5 +1,6 @@
 package client;
 
+import java.awt.BorderLayout;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -15,7 +16,8 @@ public class VideoFrame{
 	public VideoFrame() {
 		frame = new JFrame();
 		label = new JLabel();
-		frame.getContentPane().add(label);
+		frame.add(label,BorderLayout.CENTER);
+		
 		frame.setVisible(false);
 	}
 	/**
@@ -30,6 +32,8 @@ public class VideoFrame{
 				frame.pack();
 				frame.setVisible(true);
 			}
+			img = null;
+			bufferedImage = null;
 		}
 		catch(Exception e){
 			System.err.println("Unable to video img.");
@@ -44,7 +48,8 @@ public class VideoFrame{
 	    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
 	    RenderingHints.VALUE_INTERPOLATION_BILINEAR);  
 	    g.drawImage(img, 0, 0, newW, newH, 0, 0, w, h, null);  
-	    g.dispose();  
+	    g.dispose();
+	    img = null;
 	    return dimg;  
 	}
 }

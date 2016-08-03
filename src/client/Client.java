@@ -34,10 +34,13 @@ public class Client implements Runnable{
 					System.exit(0);
 				}
 			});
+			MyPic myPic = null;
+			BufferedImage image = null;
 			while(working){
-				MyPic myPic = (MyPic)postman.recv();
-				BufferedImage image = myPic.image;
+				myPic = (MyPic)postman.recv();
+				image = myPic.image;
 				vf.videoShow(image);
+				Thread.sleep(30);
 			}
 		}
 		catch(Exception e) {
@@ -46,6 +49,7 @@ public class Client implements Runnable{
 		finally{
 			if(postman!=null)
 				postman.close();
+			System.exit(0);
 		}
 		
 	}

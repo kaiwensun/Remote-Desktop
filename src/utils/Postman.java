@@ -27,6 +27,8 @@ public class Postman {
 	}
 	public  void send(Object obj) throws IOException{
 		outStream.writeObject(obj);
+		outStream.flush();
+		outStream.reset();
 	}
 	public void close(){
 		if(inStream!=null)

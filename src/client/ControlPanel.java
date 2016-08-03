@@ -14,7 +14,16 @@ public class ControlPanel extends VideoFrame{
 		MouseAdapter mouseAdapter = new MouseAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				System.out.println("MOUSE at "+e.getPoint());
+				Event event = new Event(Event.MOUSEMOVE, e.getX(),e.getY(),Cfg.frame_width,Cfg.frame_height);
+				try {
+					postman.send(event);
+				} catch (IOException e1) {
+					System.err.println("Fail to send Event "+event);
+				}
+			}
+			
+			@Override
+			public void mouseDragged(MouseEvent e) {
 				Event event = new Event(Event.MOUSEMOVE, e.getX(),e.getY(),Cfg.frame_width,Cfg.frame_height);
 				try {
 					postman.send(event);

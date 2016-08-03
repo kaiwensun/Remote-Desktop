@@ -51,6 +51,7 @@ public class RobotServer implements Runnable {
 	private void doEvent(Event event){
 		if(!event.isValid())
 			return;
+		System.out.println(event);
 		switch (event.eventType) {
 		case Event.KEYPRESS:
 			robot.keyPress(event.param1);
@@ -59,19 +60,15 @@ public class RobotServer implements Runnable {
 			robot.keyRelease(event.param1);
 			break;
 		case Event.MOUSEMOVE:
-			//System.out.println(event);
 			robot.mouseMove(event.param1*sz.width/event.param3, event.param2*sz.height/event.param4);
 			break;
 		case Event.MOUSEPRESS:
-			//System.out.println(event);
 			robot.mousePress(InputEvent.getMaskForButton(event.param1));
 			break;
 		case Event.MOUSERELEASE:
-			//System.out.println(event);
 			robot.mouseRelease(InputEvent.getMaskForButton(event.param1));
 			break;
 		case Event.MOUSEWHEEL:
-			//System.out.println(event);
 			robot.mouseWheel(event.param1);
 			break;
 		default:
