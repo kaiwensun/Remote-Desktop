@@ -18,4 +18,5 @@ A remote computer GUI controller based on Java Robot.
 ## Todos
 * Config json file for server
 * Javadoc
+* Security (user authentication and message encryption)
 
