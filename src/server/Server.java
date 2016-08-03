@@ -36,6 +36,8 @@ public class Server {
 				
 				vst.start();
 				rst.start();
+				
+				Thread.sleep(15);
 			}
 		} catch (IOException e1) {
 			System.err.println("Can't open port "+port);
