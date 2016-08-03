@@ -40,7 +40,7 @@ public class Client implements Runnable{
 				myPic = (MyPic)postman.recv();
 				image = myPic.image;
 				vf.videoShow(image);
-				Thread.sleep(30);
+				Thread.sleep(15);
 			}
 		}
 		catch(Exception e) {

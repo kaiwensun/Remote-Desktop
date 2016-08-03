@@ -32,8 +32,6 @@ public class VideoFrame{
 				frame.pack();
 				frame.setVisible(true);
 			}
-			img = null;
-			bufferedImage = null;
 		}
 		catch(Exception e){
 			System.err.println("Unable to video img.");
@@ -49,7 +47,6 @@ public class VideoFrame{
 	    RenderingHints.VALUE_INTERPOLATION_BILINEAR);  
 	    g.drawImage(img, 0, 0, newW, newH, 0, 0, w, h, null);  
 	    g.dispose();
-	    img = null;
 	    return dimg;  
 	}
 }
