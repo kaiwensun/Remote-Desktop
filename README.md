@@ -7,10 +7,13 @@ A remote computer GUI controller based on Java Robot.
 ##### 2016-08-02:
 * Project starts.
 * Show live view of remote computer.
-* Remote mouse motion.
+* Remote mouse actions (motion, click, wheel, etc.).
 * Build skeletons for mouse actions and keyboard actions.
 
+##### 2016-08-03:
+* Fix memory leak at server side.
+ 
 ## Todos
-* Fix bugs in mouse button click.
+* Fix Java heap memory leak at client side.
 * Keyboard actions.
 
