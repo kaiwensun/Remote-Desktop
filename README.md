@@ -14,9 +14,9 @@ A remote computer GUI controller based on Java Robot.
 * Fix memory leak at server side.
 * Fix memory leak at client side. The memory leak was caused not having flush ()and reset() on outStream of postman, so image accumulated at client's postman recv().
 * Support keyboard actions (press and release).
+* Config json file for server
+* Security (AES encrypted user authentication and message encryption)
  
 ## Todos
-* Config json file for server
 * Javadoc
-* Security (user authentication and message encryption)
 
