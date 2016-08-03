@@ -7,7 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.io.IOException;
 
-import utils.Event;
+import utils.MKEvent;
 import utils.Postman;
 
 public class ControlPanel extends VideoFrame{
@@ -20,11 +20,11 @@ public class ControlPanel extends VideoFrame{
 			public void mouseMoved(MouseEvent e) {
 				if(!frame.isActive())
 					return;
-				Event event = new Event(Event.MOUSEMOVE, e.getX(),e.getY(),Cfg.frame_width,Cfg.frame_height);
+				MKEvent event = new MKEvent(MKEvent.MOUSEMOVE, e.getX(),e.getY(),Cfg.frame_width,Cfg.frame_height);
 				try {
 					postman.send(event);
 				} catch (IOException e1) {
-					System.err.println("Fail to send Event "+event);
+					System.err.println("Fail to send MKEvent "+event);
 				}
 			}
 			
@@ -32,11 +32,11 @@ public class ControlPanel extends VideoFrame{
 			public void mouseDragged(MouseEvent e) {
 				if(!frame.isActive())
 					return;
-				Event event = new Event(Event.MOUSEMOVE, e.getX(),e.getY(),Cfg.frame_width,Cfg.frame_height);
+				MKEvent event = new MKEvent(MKEvent.MOUSEMOVE, e.getX(),e.getY(),Cfg.frame_width,Cfg.frame_height);
 				try {
 					postman.send(event);
 				} catch (IOException e1) {
-					System.err.println("Fail to send Event "+event);
+					System.err.println("Fail to send MKEvent "+event);
 				}
 			}
 			
@@ -44,11 +44,11 @@ public class ControlPanel extends VideoFrame{
 			public void mousePressed(MouseEvent e){
 				if(!frame.isActive())
 					return;
-				Event event = new Event(Event.MOUSEPRESS,e.getButton());
+				MKEvent event = new MKEvent(MKEvent.MOUSEPRESS,e.getButton());
 				try {
 					postman.send(event);
 				} catch (IOException e1) {
-					System.err.println("Fail to send Event "+event);
+					System.err.println("Fail to send MKEvent "+event);
 				}
 			}
 			
@@ -56,11 +56,11 @@ public class ControlPanel extends VideoFrame{
 			public void mouseReleased(MouseEvent e){
 				if(!frame.isActive())
 					return;
-				Event event = new Event(Event.MOUSERELEASE,e.getButton());
+				MKEvent event = new MKEvent(MKEvent.MOUSERELEASE,e.getButton());
 				try {
 					postman.send(event);
 				} catch (IOException e1) {
-					System.err.println("Fail to send Event "+event);
+					System.err.println("Fail to send MKEvent "+event);
 				}
 			}
 			
@@ -68,11 +68,11 @@ public class ControlPanel extends VideoFrame{
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				if(!frame.isActive())
 					return;
-				Event event = new Event(Event.MOUSEWHEEL, e.getWheelRotation());
+				MKEvent event = new MKEvent(MKEvent.MOUSEWHEEL, e.getWheelRotation());
 				try {
 					postman.send(event);
 				} catch (IOException e1) {
-					System.err.println("Fail to send Event "+event);
+					System.err.println("Fail to send MKEvent "+event);
 				}
             }
 			
@@ -85,21 +85,21 @@ public class ControlPanel extends VideoFrame{
 		super.label.addKeyListener(new KeyListener() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				Event event = new Event(Event.KEYPRESS, e.getKeyCode());
+				MKEvent event = new MKEvent(MKEvent.KEYPRESS, e.getKeyCode());
 				try {
 					postman.send(event);
 				} catch (IOException e1) {
-					System.err.println("Fail to send Event "+event);
+					System.err.println("Fail to send MKEvent "+event);
 				}
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				Event event = new Event(Event.KEYRELEASE, e.getKeyCode());
+				MKEvent event = new MKEvent(MKEvent.KEYRELEASE, e.getKeyCode());
 				try {
 					postman.send(event);
 				} catch (IOException e1) {
-					System.err.println("Fail to send Event "+event);
+					System.err.println("Fail to send MKEvent "+event);
 				}
 			}
 

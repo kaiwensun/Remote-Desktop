@@ -2,10 +2,8 @@ package server;
 
 import java.awt.image.BufferedImage;
 
-import utils.ImageCapture;
 import utils.MyPic;
 import utils.Postman;
-import utils.ScreenCapture;
 
 public class VideoServer implements Runnable{
 
@@ -31,10 +29,12 @@ public class VideoServer implements Runnable{
 					pic = null;
 				}
 				catch (Exception e) {
-					System.err.println("Fail to send image. Stop thread.");
+					System.err.println("Fail to send image. Stop VideoServer thread.");
 					break;
 				}
+				Thread.sleep(15);
 			}
+		} catch (InterruptedException e) {
 		}
 		finally{
 			postman.close();

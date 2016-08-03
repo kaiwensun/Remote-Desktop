@@ -1,9 +1,12 @@
-package client;
+package server;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,13 +23,11 @@ public class Cfg {
 	private static JSONObject json;
 	private static final String NL = System.getProperty("line.separator");
 	
-	public static String ip = "127.0.0.1";
 	public static int port = 9001;
-	public static int frame_height = 480;
-	public static int frame_width = 720;
-	public static String username = "";
-	public static String password = "";
+	public static List<UserInfo> users = new LinkedList<>();
 	public static boolean authenticate = true;
+	
+	
 	
 	/**
 	 * Initialize Cfg by loading the configuration json file.
@@ -69,26 +70,43 @@ public class Cfg {
 	 * @param json json object
 	 */
 	private static void parse(JSONObject json){
-		try {ip = json.getString("ip");} catch (Exception e) {}
 		try {port = json.getInt("port");} catch (Exception e) {}
-		try {frame_height = json.getInt("frame height");} catch (Exception e) {}
-		try {frame_width = json.getInt("frame width");} catch (Exception e) {}
-		try {username = json.getString("username");} catch (Exception e) {}
-		try {password = json.getString("password");} catch (Exception e) {}
+		JSONArray array = null;
+		try {
+			array = json.getJSONArray("users");
+			for(int i=0;i<array.length();i++){
+				try{
+					JSONObject user = array.getJSONObject(i);
+					String username = user.getString("username");
+					String password = user.getString("password");
+					UserInfo userInfo = new UserInfo(username, password);
+					users.add(userInfo);
+				}
+				catch(Exception e){}
+			}
+		}catch (Exception e) {}
 		try {authenticate = json.getBoolean("authenticate");} catch (Exception e) {}
-		
 	}
 	
 	@Override
 	public String toString(){
 		return 
-			"ip: "			+	ip				+	NL
-		+	"port: "		+	port			+	NL
-		+	"frame_height: "+	frame_height	+	NL
-		+	"frame_width: "	+	frame_width		+	NL
-		+	"username's hashcode: "	+	username.hashCode()		+	NL
-		+	"password's hashcode: "	+	password.hashCode()		+	NL
-		+	"authenticate: "+	authenticate	+	NL
+			"port: "					+	port			+	NL
+		+	"Number of user records: "	+	users.size()	+	NL
+		+	"authenticate: "			+	authenticate	+	NL
 		;
+	}
+	public static void main(String[] argv){
+		init("server.json");
+		System.out.println(new Cfg());
+	}
+}
+
+class UserInfo{
+	public final String username;
+	public final String password;
+	public UserInfo(String username, String password){
+		this.username = username;
+		this.password = password;
 	}
 }

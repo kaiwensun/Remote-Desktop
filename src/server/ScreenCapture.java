@@ -1,4 +1,4 @@
-package utils;
+package server;
 
 import java.awt.AWTException;
 import java.awt.Rectangle;

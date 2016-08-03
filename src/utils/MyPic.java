@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 import javax.imageio.ImageIO;
 
-public class MyPic implements Serializable {
+public class MyPic extends Message implements Serializable {
  	private static final long serialVersionUID = -3381884330589371280L;
 	public transient BufferedImage image;
 

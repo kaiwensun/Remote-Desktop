@@ -7,7 +7,7 @@ import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.io.IOException;
 
-import utils.Event;
+import utils.MKEvent;
 import utils.Postman;
 
 public class RobotServer implements Runnable {
@@ -28,19 +28,20 @@ public class RobotServer implements Runnable {
 	@Override
 	public void run() {
 		try {
-			Event event;
 			while(true){
 				try{
-					event = (Event)postman.recv();
+					Object obj = postman.recv();
+					if(obj instanceof MKEvent){
+						doEvent((MKEvent)obj); 
+					}
 				}
 				catch (IOException e) {
-					System.err.println("Fail to send image. Stop thread.");
+					System.err.println("Fail to receive MKEvent. Stop RobotServer thread.");
 					break;
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 					break;
 				}
-				doEvent(event);
 			}
 		}
 		finally{
@@ -48,27 +49,27 @@ public class RobotServer implements Runnable {
 		}
 	}
 	
-	private void doEvent(Event event){
+	private void doEvent(MKEvent event){
 		if(!event.isValid())
 			return;
 		System.out.println(event);
 		switch (event.eventType) {
-		case Event.KEYPRESS:
+		case MKEvent.KEYPRESS:
 			robot.keyPress(event.param1);
 			break;
-		case Event.KEYRELEASE:
+		case MKEvent.KEYRELEASE:
 			robot.keyRelease(event.param1);
 			break;
-		case Event.MOUSEMOVE:
+		case MKEvent.MOUSEMOVE:
 			robot.mouseMove(event.param1*sz.width/event.param3, event.param2*sz.height/event.param4);
 			break;
-		case Event.MOUSEPRESS:
+		case MKEvent.MOUSEPRESS:
 			robot.mousePress(InputEvent.getMaskForButton(event.param1));
 			break;
-		case Event.MOUSERELEASE:
+		case MKEvent.MOUSERELEASE:
 			robot.mouseRelease(InputEvent.getMaskForButton(event.param1));
 			break;
-		case Event.MOUSEWHEEL:
+		case MKEvent.MOUSEWHEEL:
 			robot.mouseWheel(event.param1);
 			break;
 		default:

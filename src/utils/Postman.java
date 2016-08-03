@@ -23,7 +23,6 @@ public class Postman {
 
 	public Object recv() throws ClassNotFoundException, IOException{
 		return inStream.readObject();
-		
 	}
 	public  void send(Object obj) throws IOException{
 		outStream.writeObject(obj);
@@ -34,12 +33,14 @@ public class Postman {
 		if(inStream!=null)
 			try {
 				inStream.close();
+				inStream = null;
 			} catch (IOException e) {
 				//e.printStackTrace();
 			}
 		if(outStream!=null)
 			try {
 				outStream.close();
+				outStream = null;
 			} catch (IOException e) {
 				//e.printStackTrace();
 			}
@@ -47,8 +48,14 @@ public class Postman {
 			try {
 				System.out.println("Postman at "+socket+" closed.");
 				socket.close();
+				socket = null;
 			} catch (IOException e) {
 				//e.printStackTrace();
 			}
+	}
+	
+	@Override
+	public String toString(){
+		return "postman at "+socket.toString();
 	}
 }

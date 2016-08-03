@@ -1,4 +1,4 @@
-package utils;
+package server;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
