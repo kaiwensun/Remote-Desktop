@@ -23,9 +23,9 @@ public class Cfg {
 	private static JSONObject json;
 	private static final String NL = System.getProperty("line.separator");
 	
-	public static int port = 9001;
-	public static List<UserInfo> users = new LinkedList<>();
-	public static boolean authenticate = true;
+	public static int port = 9001;				//server socket listener port
+	public static List<UserInfo> users = new LinkedList<>();	//a list of user information
+	public static boolean authenticate = true;	//whether authenticate user. should be identical to client side Cfg.
 	
 	
 	
@@ -79,7 +79,10 @@ public class Cfg {
 					JSONObject user = array.getJSONObject(i);
 					String username = user.getString("username");
 					String password = user.getString("password");
-					UserInfo userInfo = new UserInfo(username, password);
+					boolean allowaction = false;
+					try{allowaction = user.getBoolean("allow action");}
+					catch(Exception e){}
+					UserInfo userInfo = new UserInfo(username, password, allowaction);
 					users.add(userInfo);
 				}
 				catch(Exception e){}
@@ -88,6 +91,9 @@ public class Cfg {
 		try {authenticate = json.getBoolean("authenticate");} catch (Exception e) {}
 	}
 	
+	/**
+	 * Convert non-confidential configuration fields to string. 
+	 */
 	@Override
 	public String toString(){
 		return 
@@ -96,17 +102,27 @@ public class Cfg {
 		+	"authenticate: "			+	authenticate	+	NL
 		;
 	}
-	public static void main(String[] argv){
-		init("server.json");
-		System.out.println(new Cfg());
-	}
 }
 
+/**
+ * User information including username and password. 
+ * @author Kaiwen Sun
+ *
+ */
 class UserInfo{
 	public final String username;
 	public final String password;
-	public UserInfo(String username, String password){
+	public final boolean allowaction;
+	
+	/**
+	 * Constructor.
+	 * @param username username
+	 * @param password password
+	 * @param allowaction whether the user is allowed to conduct mouse and keyboard action
+	 */
+	public UserInfo(String username, String password, boolean allowaction){
 		this.username = username;
 		this.password = password;
+		this.allowaction = allowaction;
 	}
 }

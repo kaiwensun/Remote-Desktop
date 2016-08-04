@@ -7,13 +7,28 @@ import java.util.Random;
 import utils.Postman;
 import utils.SecuString;
 
+/**
+ * Server (controllee) main class.
+ * @author Kaiwen Sun
+ *
+ */
 public class Server {
 	private int port = Cfg.port;
+	
+	/**
+	 * Server (controllee) main entry.
+	 * @param argv not used.
+	 */
 	public static void main(String[] argv){
 		Cfg.init("server.json");
 		Server server = new Server();
 		server.run();
 	}
+	
+	/**
+	 * Run the server. Authenticate user (if required), then start two threads sending
+	 * screen image and receiving commands (if allowed).
+	 */
 	private void run(){
 		ServerSocket listener = null;
 		try {
@@ -21,21 +36,28 @@ public class Server {
 			while(true){
 				Socket incoming = listener.accept();
 				Postman postman = new Postman(incoming);
+				
+				boolean allowaction = true;
 				if(Cfg.authenticate){
-					if(!authenticate(postman)){
+					UserInfo userInfo = authenticate(postman);
+					if(userInfo==null){
 						postman.close();
 						postman = null;
 						continue;
 					}
+					allowaction = allowaction && userInfo.allowaction;
 				}
 				Runnable vsr = new VideoServer(postman);
 				Thread vst = new Thread(vsr);
 				
-				Runnable rsr = new RobotServer(postman);
-				Thread rst = new Thread(rsr);
-				
+				Thread rst = null;
+				if(allowaction){
+					Runnable rsr = new RobotServer(postman);
+					rst = new Thread(rsr);
+				}
 				vst.start();
-				rst.start();
+				if(allowaction)
+					rst.start();
 				
 				Thread.sleep(15);
 			}
@@ -53,7 +75,12 @@ public class Server {
 		}
 	}
 	
-	private boolean authenticate(Postman postman){
+	/**
+	 * Authenticate user according to users record in configuration.
+	 * @param postman postman used to communicate with user
+	 * @return userInfo if user is authenticated. null if fail to authenticate.
+	 */
+	private UserInfo authenticate(Postman postman){
 		Object obj = null;
 		try {
 			obj = postman.recv();
@@ -62,16 +89,16 @@ public class Server {
 			e.printStackTrace();
 		}
 		if(!(obj instanceof SecuString))
-			return false;
+			return null;
 		SecuString secuStr = (SecuString)obj;
 		for(UserInfo userInfo : Cfg.users){
 			if(userInfo.username.equals(secuStr.decrypt(userInfo.password))){
 				try {
 					postman.send(new SecuString("OK", userInfo.password));
-					return true;
+					return userInfo;
 				} catch (IOException e) {
 					System.err.println(postman+" fails to reply true user's authentication message.");
-					return false;
+					return null;
 				}
 			}
 		}
@@ -80,10 +107,9 @@ public class Server {
 			postman.send(new SecuString("FAIL", Integer.toHexString(rg.nextInt())));
 		} catch (IOException e) {
 			System.err.println(postman+" fails to reply false user's authentication message.");
-			return false;
+			return null;
 		}
-		return false;
-		
+		return null;
 	}
 }
 

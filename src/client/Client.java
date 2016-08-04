@@ -9,14 +9,31 @@ import utils.MyPic;
 import utils.Postman;
 import utils.SecuString;
 
+/**
+ * Client (controller) side main class.
+ * @author Kaiwen Sun
+ *
+ */
 public class Client implements Runnable{
 	private volatile boolean working = true;
-	public static void main(String[] argv) throws IOException{
+	
+	/**
+	 * Client (controller) side main entry to run the client.
+	 * @param argv not used
+	 */
+	public static void main(String[] argv) {
 		Cfg.init("client.json");
 		Client client = new Client();
 		client.run();
 	}
 
+	/**
+	 * Run client.
+	 * Establish socket connection with server via Postman.
+	 * Encrypted username and password authentication.
+	 * Create a JLabel monitoring user's mouse and keyboard actions on it, and pass actions to server.
+	 * Receive live video from server and display it on the JLabel.
+	 */
 	@Override
 	public void run() {
 		Postman postman = null;
@@ -45,7 +62,12 @@ public class Client implements Runnable{
 			while(working){
 				Object obj = postman.recv();
 				if(obj instanceof MyPic){
-					myPic = (MyPic)postman.recv();
+					try{
+						myPic = (MyPic)postman.recv();
+					}
+					catch(Exception e){
+						break;
+					}
 					image = myPic.image;
 					vf.videoShow(image);
 				}
@@ -61,6 +83,11 @@ public class Client implements Runnable{
 		}
 	}
 	
+	/**
+	 * Login to server according to the Cfg.username and Cfg.password via postman.
+	 * @param postman postman
+	 * @return true if successfully authenticated; false otherwise.
+	 */
 	private boolean authenticate(Postman postman){
 		SecuString secuStr = new SecuString(Cfg.username,Cfg.password);
 		try {

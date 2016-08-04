@@ -9,10 +9,18 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+/**
+ * Video displayer.
+ * @author Kaiwen Sun
+ *
+ */
 public class VideoFrame{
 	protected JFrame frame;
 	protected JLabel label;
 	
+	/**
+	 * Constructor. create a JFrame and JLabel to display video.
+	 */
 	public VideoFrame() {
 		frame = new JFrame();
 		label = new JLabel();
@@ -20,8 +28,9 @@ public class VideoFrame{
 		
 		frame.setVisible(false);
 	}
+	
 	/**
-	 * Show video based on given images.
+	 * Show video based on given images. video size is defined in Cfg class.
 	 * @param img a BufferedImage frame of video.
 	 */
 	public void videoShow(BufferedImage img){
@@ -38,7 +47,14 @@ public class VideoFrame{
 		}
 	}
 	
-	public static BufferedImage resize(BufferedImage img, int newW, int newH) {  
+	/** 
+	 * Resize image. 
+	 * @param img image
+	 * @param newW new image width
+	 * @param newH new image height
+	 * @return resized image
+	 */
+	private static BufferedImage resize(BufferedImage img, int newW, int newH) {  
 	    int w = img.getWidth();  
 	    int h = img.getHeight();  
 	    BufferedImage dimg = new BufferedImage(newW, newH, img.getType());  

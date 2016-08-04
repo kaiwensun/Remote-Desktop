@@ -8,7 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Configuration. Most fields of this class are public and static in order
+ * Configuration of client. Most fields of this class are public and static in order
  * to be used and add new field easily. Assigning values from out of this
  * class is depreciated. Please be sure you do understand what you are doing
  * if you want to assign values. 
@@ -20,13 +20,13 @@ public class Cfg {
 	private static JSONObject json;
 	private static final String NL = System.getProperty("line.separator");
 	
-	public static String ip = "127.0.0.1";
-	public static int port = 9001;
-	public static int frame_height = 480;
-	public static int frame_width = 720;
-	public static String username = "";
-	public static String password = "";
-	public static boolean authenticate = true;
+	public static String ip = "127.0.0.1";		//server's IP address
+	public static int port = 9001;				//server's listener port
+	public static int frame_height = 480;		//local screen height
+	public static int frame_width = 720;		//local screen width
+	public static String username = "";			//login username
+	public static String password = "";			//login password
+	public static boolean authenticate = true;	//whether authenticate user. should be identical to server side Cfg.
 	
 	/**
 	 * Initialize Cfg by loading the configuration json file.
@@ -79,6 +79,9 @@ public class Cfg {
 		
 	}
 	
+	/**
+	 * Convert configuration fields to string (username and password are hash-coded). 
+	 */
 	@Override
 	public String toString(){
 		return 

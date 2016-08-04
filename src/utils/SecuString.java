@@ -17,11 +17,21 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * AES encrypted serializable string message sent on internet.
+ * @author Kaiwen Sun
+ *
+ */
 public class SecuString extends Message implements Serializable {
 	private static final long serialVersionUID = -1400067914953447482L;
 	private transient byte[] encrypted;
 	private int length;
 	
+	/**
+	 * Constructor. Create an AES encrypted string.
+	 * @param str plain text
+	 * @param key AES encryption key
+	 */
 	public SecuString(String str, String key){
 		byte[] tmpbyte = null;
 		try{
@@ -36,6 +46,12 @@ public class SecuString extends Message implements Serializable {
 			encrypted = tmpbyte;
 		}
 	}
+	
+	/**
+	 * Decipher the message.
+	 * @param key decryption AES key.
+	 * @return deciphered message
+	 */
     public String decrypt(String key){
     	try{
     		Cipher decryptor = getDecryptor(key);
@@ -48,6 +64,11 @@ public class SecuString extends Message implements Serializable {
     
     }
     
+    /**
+     * Construct an AES Cipher object to decipher message using a given key.
+     * @param key AES key
+     * @return Cipher object
+     */
     private static Cipher getDecryptor(String key){
     	if(key==null)
     		return null;
@@ -63,6 +84,12 @@ public class SecuString extends Message implements Serializable {
 		}
 
     }
+    
+    /**
+     * Construct an AES Cipher object to encrypt message using a given key.
+     * @param key AES key
+     * @return Cipher object
+     */
     private static Cipher getEncryptor(String key) {
     	if(key==null)
     		return null;
@@ -77,6 +104,14 @@ public class SecuString extends Message implements Serializable {
 			return null;
 		}
     }
+    
+    /**
+     * Get AES key
+     * @param key key string
+     * @return AES key
+     * @throws NoSuchAlgorithmException no such algorithm
+     * @throws NoSuchPaddingException no such padding
+     */
     private static Key getAesKey(String key) throws NoSuchAlgorithmException, NoSuchPaddingException{
     	if(key.getBytes().length!=128/8){
     		StringBuilder sb = new StringBuilder();
@@ -90,7 +125,11 @@ public class SecuString extends Message implements Serializable {
     	return aesKey;
     }
     
-    
+    /**
+     * Serialize to write out this object.
+     * @param out output stream
+     * @throws IOException fail to serialize write
+     */
     private void writeObject(ObjectOutputStream out) throws IOException {
     	length = encrypted.length;
     	out.defaultWriteObject();
@@ -100,6 +139,12 @@ public class SecuString extends Message implements Serializable {
         
     }
 
+    /**
+     * Serialize to read in this object.
+     * @param in input stream
+     * @throws IOException fail to serialize read
+     * @throws ClassNotFoundException fail to serialize read
+     */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         encrypted = new byte[length];

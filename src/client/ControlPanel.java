@@ -10,7 +10,17 @@ import java.io.IOException;
 import utils.MKEvent;
 import utils.Postman;
 
+/**
+ * Mouse and keyboard monitor extending VideoFrame.
+ * @author Kaiwen Sun
+ *
+ */
 public class ControlPanel extends VideoFrame{
+	
+	/**
+	 * Constructor. Establish monitor on mouse and keyboard.
+	 * @param postman postman
+	 */
 	public ControlPanel(Postman postman) {
 		super();
 		super.label.setFocusable(true);

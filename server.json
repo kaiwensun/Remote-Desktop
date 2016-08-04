@@ -3,11 +3,13 @@
 	"users": [
 		{
 			"username": "user1",
-			"password": "user1's password"
+			"password": "user1's password",
+			"allow action": true
 		},
 		{
 			"username": "user2",
-			"password": "user2's password"
+			"password": "user2's password",
+			"allow action": false
 		},
 	],
 	"authenticate": true

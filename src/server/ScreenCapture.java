@@ -6,10 +6,19 @@ import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 
+/**
+ * Capture screen image.
+ * @author Kaiwen Sun
+ *
+ */
 public class ScreenCapture implements ImageCapture {
 
 	private Robot robot;
 	private Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+	
+	/**
+	 * Constructor.
+	 */
 	public ScreenCapture() {
 		try {
 			robot = new Robot();
@@ -17,6 +26,11 @@ public class ScreenCapture implements ImageCapture {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Capture screen image.
+	 * @return captured screen image
+	 */
 	@Override
 	public BufferedImage capture() {
 		if(robot!=null)

@@ -3,7 +3,7 @@ package utils;
 import java.io.Serializable;
 
 /**
- * Mouse and Keyboard event. Sent from client to server.
+ * Mouse and Keyboard event message. Sent from client to server.
  * @author Kaiwen Sun (Ëï¿¬ÎÄ)
  *
  */
@@ -24,6 +24,14 @@ public class MKEvent extends Message implements Serializable {
 	public final int param2;
 	public final int param3;		//width of controller's screen in pixels
 	public final int param4;		//height of controller's screen in pixels
+	
+	/**
+	 * Constructor.
+	 * @param eventType type of mouse and keyboard event. Should be one of 
+	 * MOUSEPRESS = 0, MOUSERELEASE = 1, MOUSEWHEEL = 3, KEYPRESS = 4, KEYRELEASE = 5.
+	 * @param param parameter of event.
+	 * @see #isValid()
+	 */
 	public MKEvent(int eventType, int param){
 		this.eventType = eventType;
 		this.param1 = param;
@@ -31,13 +39,16 @@ public class MKEvent extends Message implements Serializable {
 		this.param3 = -1;
 		this.param4 = -1;
 	}
-	public MKEvent (int evenType, int param1, int param2){
-		this.eventType = evenType;
-		this.param1 = param1;
-		this.param2 = param2;
-		this.param3 = -1;
-		this.param4 = -1;
-	}
+	
+	/**
+	 * Construcor.
+	 * @param evenType type of mouse and keyboard event. Should be MOUSEMOVE = 2.
+	 * @param param1 parameter 1 of event.
+	 * @param param2 parameter 2 of event.
+	 * @param param3 parameter 3 of event.
+	 * @param param4 parameter 4 of event.
+	 * @see #isValid()
+	 */
 	public MKEvent (int evenType, int param1, int param2, int param3, int param4){
 		this.eventType = evenType;
 		this.param1 = param1;
@@ -45,6 +56,11 @@ public class MKEvent extends Message implements Serializable {
 		this.param3 = param3;
 		this.param4 = param4;
 	}
+	
+	/**
+	 * Determine if the MKEvent is understandable.
+	 * @return true if valid. false otherwise.
+	 */
 	public boolean isValid(){
 		switch (eventType) {
 		case MKEvent.KEYPRESS:
@@ -64,6 +80,9 @@ public class MKEvent extends Message implements Serializable {
 		}
 	}
 	
+	/**
+	 * Convert the type and parameters of MKEvent to a string.
+	 */
 	@Override
 	public String toString(){
 		String type = null;

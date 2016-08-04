@@ -5,15 +5,30 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+/**
+ * A socket wrapper to send and receive serializable objects.
+ * @author Kaiwen Sun
+ *
+ */
 public class Postman {
 	private Socket socket;
 	private ObjectInputStream inStream;
 	private ObjectOutputStream outStream;
 	
+	/**
+	 * Constructor.
+	 * @param socket socket
+	 * @throws IOException fail to open I/O stream.
+	 */
 	public Postman(Socket socket) throws IOException{
 		this.socket = socket;
 		init();
 	}
+	
+	/**
+	 * Initialize I/O stream on socket.
+	 * @throws IOException fail to init
+	 */
 	private void init() throws IOException{
 		 outStream = new ObjectOutputStream(socket.getOutputStream());
 		 outStream.flush();
@@ -21,28 +36,42 @@ public class Postman {
 		 inStream = new ObjectInputStream(inputStream);
 	}
 
+	/**
+	 * Receive serializable object. 
+	 * @return received serializable object.
+	 * @throws ClassNotFoundException fail to receive
+	 * @throws IOException fail to receive
+	 */
 	public Object recv() throws ClassNotFoundException, IOException{
 		return inStream.readObject();
 	}
+	
+	/**
+	 * Send serializable object.
+	 * @param obj serializable object to be sent
+	 * @throws IOException fail to send
+	 */
 	public  void send(Object obj) throws IOException{
 		outStream.writeObject(obj);
 		outStream.flush();
 		outStream.reset();
 	}
+	
+	/**
+	 * Close the I/O stream and socket. The postman should not be used anymore after being closed.
+	 */
 	public void close(){
 		if(inStream!=null)
 			try {
 				inStream.close();
 				inStream = null;
 			} catch (IOException e) {
-				//e.printStackTrace();
 			}
 		if(outStream!=null)
 			try {
 				outStream.close();
 				outStream = null;
 			} catch (IOException e) {
-				//e.printStackTrace();
 			}
 		if(socket!=null)
 			try {
@@ -50,10 +79,12 @@ public class Postman {
 				socket.close();
 				socket = null;
 			} catch (IOException e) {
-				//e.printStackTrace();
 			}
 	}
-	
+
+	/**
+	 * Convert the postman to a string containing its socket information.
+	 */
 	@Override
 	public String toString(){
 		return "postman at "+socket.toString();

@@ -10,11 +10,21 @@ import java.io.IOException;
 import utils.MKEvent;
 import utils.Postman;
 
+/**
+ * Server receiving mouse and keyboard controlling message.
+ * @author Kaiwen Sun
+ *
+ */
 public class RobotServer implements Runnable {
 
 	private Postman postman;
 	private Robot robot;
 	private Dimension sz = Toolkit.getDefaultToolkit().getScreenSize();
+	
+	/**
+	 * Constructor.
+	 * @param postman postman
+	 */
 	public RobotServer(Postman postman){
 		this.postman = postman;
 		try {
@@ -25,6 +35,9 @@ public class RobotServer implements Runnable {
 		}
 	}
 
+	/**
+	 * Run the server. Continuously receive mouse and keyboard commands (MKEvent). 
+	 */
 	@Override
 	public void run() {
 		try {
@@ -49,6 +62,10 @@ public class RobotServer implements Runnable {
 		}
 	}
 	
+	/**
+	 * Execute mouse and keyboard command.
+	 * @param event mouse or keyboard command.
+	 */
 	private void doEvent(MKEvent event){
 		if(!event.isValid())
 			return;
