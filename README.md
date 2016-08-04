@@ -8,16 +8,21 @@ The jar fils in [release](./release) are compiled using javac 1.8.0\_65 . You ca
 
 ## Setup Server (Controllee)
 To run the server, in the directory containing _VideoServer.jar_, run command:
+
 ~~~~
 $ java -jar VideoServer.jar
 ~~~~
+
 To configure server, in the same directory, edit the fields in _server.json_ in JSON format:
+
 | Field Name	| Value's Type	| Value's Meaning				|
 | ------------- | ------------- | ----------------------------- |
 | port			| string		| Application's service port	|
 | users			| array			| A list of user information. See next table. |
 | authenticate	| bool			| Whether to authenticate users. This field should be identical to client side configuration. If false, any client can view and control the server without login.	|
+
 For each element in the array of user information,
+
 | Field Name	| Value's Type	| Value's Meaning				|
 | ------------- | ------------- | ----------------------------- |
 | username		| string		| User which is allowed to connect to the server. UTF-8 characters	allowed	|
@@ -27,11 +32,15 @@ For each element in the array of user information,
 It is recommended to set `authenticate` as `true` and allow at most one user to control the server's mouse and keyboard, because multiple users are allowed to conect to the server synchronously.
 
 ## Setup Client (Controller)
+
 To run the client, in the directory containing _VideoServer.jar_, run command:
+
 ~~~~
 $ java -jar VideoClient.jar
 ~~~~
+
 To configure client, in the same directory, edit the fields in _client.json_ in JSON format:
+
 | Field Name	| Value's Type	| Value's Meaning				|
 | ------------- | ------------- | ----------------------------- |
 | ip			| string		| Server's IP address			|
