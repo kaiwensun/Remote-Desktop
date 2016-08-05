@@ -1,7 +1,7 @@
 # Remote-Desktop
 
 A remote computer GUI controller based on Java Robot.
-(!structure.png)[structure.png]
+![structure.png](structure.png)
 
 ## Supported Environment
 The application has been tested under Ubuntu 16.04, Windows 7 and Windows 10. But all desktop operating systems supporting Java (awt & swing) should be able to run this system. Server and clients don't have to be the same kind of operating system.
