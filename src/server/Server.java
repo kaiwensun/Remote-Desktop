@@ -25,53 +25,76 @@ public class Server {
 		server.run();
 	}
 	
+	
+	private void buildConnectionWithClient(Postman postman){
+		boolean allowaction = true;
+		if(Cfg.authenticate){
+			UserInfo userInfo = authenticate(postman);
+			if(userInfo==null){
+				postman.close();
+				postman = null;
+				return;
+			}
+			allowaction = allowaction && userInfo.allowaction;
+		}
+		Runnable vsr = new VideoServer(postman);
+		Thread vst = new Thread(vsr);
+		
+		Thread rst = null;
+		if(allowaction){
+			Runnable rsr = new RobotServer(postman);
+			rst = new Thread(rsr);
+		}
+		vst.start();
+		if(allowaction)
+			rst.start();
+		if(Cfg.postoffice_register){
+			try {
+				vst.join();
+			} catch (InterruptedException e) {
+			}
+			try {
+				rst.join();
+			} catch (InterruptedException e) {
+			}
+			deregisterAtPostoffice();
+		}
+		return;
+	}
 	/**
 	 * Run the server. Authenticate user (if required), then start two threads sending
 	 * screen image and receiving commands (if allowed).
 	 */
 	private void run(){
-		ServerSocket listener = null;
-		try {
-			listener = new ServerSocket(port);
-			while(true){
-				Socket incoming = listener.accept();
-				Postman postman = new Postman(incoming);
-				
-				boolean allowaction = true;
-				if(Cfg.authenticate){
-					UserInfo userInfo = authenticate(postman);
-					if(userInfo==null){
-						postman.close();
-						postman = null;
-						continue;
-					}
-					allowaction = allowaction && userInfo.allowaction;
-				}
-				Runnable vsr = new VideoServer(postman);
-				Thread vst = new Thread(vsr);
-				
-				Thread rst = null;
-				if(allowaction){
-					Runnable rsr = new RobotServer(postman);
-					rst = new Thread(rsr);
-				}
-				vst.start();
-				if(allowaction)
-					rst.start();
-				
-				Thread.sleep(15);
+		if(Cfg.postoffice_register){
+			Postman postman = registerAtPostoffice();
+			if(postman==null){
+				return;
 			}
-		} catch (IOException e1) {
-			System.err.println("Can't open port "+port);
-			return;
+			buildConnectionWithClient(postman);
 		}
-		catch(Throwable throwable){}
-		finally{
-			if(listener!=null)
-				try {
-					listener.close();
-				} catch (IOException e) {
+		else{
+			ServerSocket listener = null;
+			try {
+				listener = new ServerSocket(port);
+				while(true){
+					Socket incoming = listener.accept();
+					Postman postman = new Postman(incoming);
+					
+					buildConnectionWithClient(postman);
 				}
+			} catch (IOException e1) {
+				System.err.println("Can't open port "+port);
+				return;
+			}
+			catch(Throwable throwable){}
+			finally{
+				if(listener!=null)
+					try {
+						listener.close();
+					} catch (IOException e) {
+					}
+			}
 		}
 	}
 	
@@ -110,6 +133,40 @@ public class Server {
 			return null;
 		}
 		return null;
+	}
+	
+	private Postman registerAtPostoffice(){
+		Postman postman = null;
+		try {
+			Socket socket = new Socket(Cfg.postoffice_address,Cfg.postoffice_port);
+			postman = new Postman(socket);
+			SecuString string = new SecuString("CTRLEE REG REQ:"+Cfg.my_name, null);	//controllee register request
+			postman.send(string);
+			Object obj = postman.recv();
+			if(!(obj instanceof SecuString))
+				return null;
+			SecuString replied = (SecuString)obj;
+			String repliedstr = replied.decrypt(null);
+			if(!repliedstr.equals("CTRLEE REG ACK:OK")){
+				System.err.println("Fail to register at postoffice ("+repliedstr+").");
+				return null;
+			}
+		} catch (Exception e) {
+			return null;
+		}
+		return postman;
+	}
+	
+	private boolean deregisterAtPostoffice(){
+		try {
+			Socket socket = new Socket(Cfg.postoffice_address,Cfg.postoffice_port);
+			Postman postman = new Postman(socket);
+			SecuString string = new SecuString("CTRLEE DEREG REQ:"+Cfg.my_name, null);	//controllee deregister request
+			postman.send(string);
+		} catch (Exception e1) {
+			return false;
+		}
+		return true;
 	}
 }
 

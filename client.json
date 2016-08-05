@@ -5,5 +5,7 @@
 	"frame width": 1080,
 	"username": "user1",
 	"password": "user1's password",
-	"authenticate": true
+	"authenticate": true,
+	"postoffice register": true,
+	"controllee name": "Universe",
 }

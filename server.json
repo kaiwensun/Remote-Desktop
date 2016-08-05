@@ -1,5 +1,5 @@
 {
-	"port": 9000,
+	"port": 9001,
 	"users": [
 		{
 			"username": "user1",
@@ -12,5 +12,9 @@
 			"allow action": false
 		},
 	],
-	"authenticate": true
+	"authenticate": true,
+	"postoffice register": true,
+	"postoffice address": "127.0.0.1",
+	"postoffice port": 9000,
+	"my name": "Universe"
 }

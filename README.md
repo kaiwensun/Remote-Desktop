@@ -1,7 +1,11 @@
 # Remote-Desktop
 
+## Local Area Network Mode
 A remote computer GUI controller based on Java Robot.
 ![structure.png](structure.png)
+
+## Public Internet Mode
+This feature is under development. Please refer to the released version v1.0 which doesn't support public internet mode.
 
 ## Supported Environment
 The application has been tested under Ubuntu 16.04, Windows 7 and Windows 10. But all desktop operating systems supporting Java (awt & swing) should be able to run this system. Server and clients don't have to be the same kind of operating system.
@@ -74,3 +78,8 @@ To configure client, in the same directory, edit the fields in _client.json_ in 
 * Javadoc.
 * User guide in _README.md_
 
+##### 2016-08-05 Add public internet mode
+* Add "Postoffice" which is the central server coordinating controllees and controllers, so that controllers and controllees in different local network hiden behind NAT can communicate.
+
+## Todos
+* In public internet mode, gracefully exit controllees when all controllers exit.

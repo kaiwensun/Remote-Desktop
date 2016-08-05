@@ -20,20 +20,22 @@ public class Cfg {
 	private static JSONObject json;
 	private static final String NL = System.getProperty("line.separator");
 	
-	public static String ip = "127.0.0.1";		//server's IP address
-	public static int port = 9001;				//server's listener port
-	public static int frame_height = 480;		//local screen height
-	public static int frame_width = 720;		//local screen width
-	public static String username = "";			//login username
-	public static String password = "";			//login password
-	public static boolean authenticate = true;	//whether authenticate user. should be identical to server side Cfg.
+	protected static String ip = "127.0.0.1";		//server's IP address
+	protected static int port = 9001;				//server's listener port
+	protected static int frame_height = 480;		//local screen height
+	protected static int frame_width = 720;		//local screen width
+	protected static String username = "";			//login username
+	protected static String password = "";			//login password
+	protected static boolean authenticate = true;	//whether authenticate user. should be identical to server side Cfg.
+	protected static boolean postoffice_register = true;	//whether use postoffice as a proxy to communicate with controllee.
+	protected static String controllee_name = null;	//controllee's name
 	
 	/**
 	 * Initialize Cfg by loading the configuration json file.
 	 * @param filename configuration file path and name
 	 * @return successfully load configuration file or not
 	 */
-	public static boolean init(String filename){
+	protected static boolean init(String filename){
 		file = new File(filename);
 		if(!file.isFile() || !file.canRead()){
 			return false;
@@ -76,6 +78,8 @@ public class Cfg {
 		try {username = json.getString("username");} catch (Exception e) {}
 		try {password = json.getString("password");} catch (Exception e) {}
 		try {authenticate = json.getBoolean("authenticate");} catch (Exception e) {}
+		try {postoffice_register = json.getBoolean("postoffice register");} catch (Exception e) {}
+		try {controllee_name = json.getString("controllee name");} catch (Exception e) {}
 		
 	}
 	
@@ -92,6 +96,8 @@ public class Cfg {
 		+	"username's hashcode: "	+	username.hashCode()		+	NL
 		+	"password's hashcode: "	+	password.hashCode()		+	NL
 		+	"authenticate: "+	authenticate	+	NL
+		+	"postoffice register: "	+	postoffice_register		+	NL
+		+	"controllee name: "		+	controllee_name			+	NL
 		;
 	}
 }

@@ -43,7 +43,9 @@ public class Postman {
 	 * @throws IOException fail to receive
 	 */
 	public Object recv() throws ClassNotFoundException, IOException{
-		return inStream.readObject();
+		synchronized (inStream) {
+			return inStream.readObject();	
+		}
 	}
 	
 	/**
@@ -52,9 +54,11 @@ public class Postman {
 	 * @throws IOException fail to send
 	 */
 	public  void send(Object obj) throws IOException{
-		outStream.writeObject(obj);
-		outStream.flush();
-		outStream.reset();
+		synchronized (outStream) {
+			outStream.writeObject(obj);
+			outStream.flush();
+			outStream.reset();	
+		}
 	}
 	
 	/**

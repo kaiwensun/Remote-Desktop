@@ -40,6 +40,13 @@ public class Client implements Runnable{
 		try{
 			Socket socket=new Socket(Cfg.ip,Cfg.port);
 			postman = new Postman(socket);
+			
+			if(Cfg.postoffice_register){
+				if(!registerAtPostoffice(postman)){
+					return;
+				}
+			}
+			
 			if(Cfg.authenticate && !authenticate(postman)){
 				System.err.println("Login failed. Program exit.");
 				postman.close();
@@ -117,5 +124,25 @@ public class Client implements Runnable{
 			return true;
 		else
 			return false;
+	}
+	
+
+	private boolean registerAtPostoffice(Postman postman){
+		try {
+			SecuString string = new SecuString("CTRLER REG REQ:"+Cfg.controllee_name, null);	//controllee register request
+			postman.send(string);
+			Object obj = postman.recv();
+			if(!(obj instanceof SecuString))
+				return false;
+			SecuString replied = (SecuString)obj;
+			String repliedstr = replied.decrypt(null);
+			if(!repliedstr.equals("CTRLER REG ACK:OK")){
+				System.err.println("Fail to register at postoffice("+repliedstr+").");
+				return false;
+			}
+		} catch (Exception e1) {
+			return false;
+		}
+		return true;
 	}
 }

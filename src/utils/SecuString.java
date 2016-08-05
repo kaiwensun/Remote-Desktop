@@ -30,9 +30,13 @@ public class SecuString extends Message implements Serializable {
 	/**
 	 * Constructor. Create an AES encrypted string.
 	 * @param str plain text
-	 * @param key AES encryption key
+	 * @param key AES encryption key. If string is null or empty, then use str as cipher text.
 	 */
 	public SecuString(String str, String key){
+		if(key==null || key.equals("")){
+			encrypted = str.getBytes();
+			return;
+		}
 		byte[] tmpbyte = null;
 		try{
 			Cipher encryptor = getEncryptor(key); 
@@ -49,10 +53,13 @@ public class SecuString extends Message implements Serializable {
 	
 	/**
 	 * Decipher the message.
-	 * @param key decryption AES key.
+	 * @param key decryption AES key. If string is null or empty, then assume message is not encrypted. 
 	 * @return deciphered message
 	 */
     public String decrypt(String key){
+    	if(key==null || key.equals("")){
+    		return new String(encrypted,StandardCharsets.UTF_8);
+		}
     	try{
     		Cipher decryptor = getDecryptor(key);
 	    	byte[] plain = decryptor.doFinal(encrypted);
