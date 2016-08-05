@@ -5,7 +5,7 @@ A remote computer GUI controller based on Java Robot.
 
 ## Supported Environment
 The application has been tested under Ubuntu 16.04, Windows 7 and Windows 10. But all desktop operating systems supporting Java (awt & swing) should be able to run this system. Server and clients don't have to be the same kind of operating system.
-The jar fils in [release](./release) are compiled using javac 1.8.0\_65 . You can run them using this or later version of JRE.
+The jar files in [release](./release) are compiled using javac 1.8.0\_65 . You can run them using this or later version of JRE.
 
 ## Setup Server (Controllee)
 To run the server, in the directory containing _VideoServer.jar_, run command:
