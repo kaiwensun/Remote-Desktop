@@ -2,10 +2,14 @@ package postoffice;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.Scanner;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import utils.ServerUserInfo;
 
 /**
  * Configuration of postoffice. Most fields of this class are public and static in order
@@ -21,7 +25,7 @@ public class Cfg {
 	private static final String NL = System.getProperty("line.separator");
 	
 	protected static int port = 9001;				//server socket listener port
-	
+	protected static HashMap<String, ServerUserInfo> users = new HashMap<>();	//a list of server user information
 	
 	
 	/**
@@ -66,6 +70,23 @@ public class Cfg {
 	 */
 	private static void parse(JSONObject json){
 		try {port = json.getInt("port");} catch (Exception e) {}
+		JSONArray array = null;
+		try {
+			array = json.getJSONArray("users");
+			for(int i=0;i<array.length();i++){
+				try{
+					JSONObject user = array.getJSONObject(i);
+					String username = user.getString("username");
+					String password = user.getString("password");
+					boolean allowaction = false;
+					try{allowaction = user.getBoolean("allow action");}
+					catch(Exception e){}
+					ServerUserInfo userInfo = new ServerUserInfo(username, password, allowaction);
+					users.putIfAbsent(username, userInfo);
+				}
+				catch(Exception e){}
+			}
+		}catch (Exception e) {}
 	}
 	
 	/**
@@ -77,3 +98,4 @@ public class Cfg {
 			"port: "					+	port			+	NL;
 	}
 }
+

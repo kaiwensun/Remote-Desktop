@@ -160,4 +160,14 @@ public class SecuString extends Message implements Serializable {
         }
         	
     }
+    @Override
+    public int hashCode(){
+    	return (new String(encrypted,StandardCharsets.UTF_8)).hashCode();
+    }
+    @Override
+    public boolean equals(Object object){
+    	if(object instanceof SecuString && ((SecuString)object).hashCode()==this.hashCode())
+    		return true;
+    	return false;
+    }
 }

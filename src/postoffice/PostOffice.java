@@ -5,8 +5,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 
+import utils.Challenger;
+import utils.ClientUserInfo;
 import utils.Postman;
 import utils.SecuString;
+import utils.ServerUserInfo;
 
 public class PostOffice{
 	
@@ -22,13 +25,16 @@ public class PostOffice{
 		if(serviceDesks.putIfAbsent(serverName, server)==null)
 			return true;
 		else
-			return false;	
+			return false;
 	}
 	
 	private boolean addClient(String serverName, Postman client){
 		ServiceDesk serviceDesk = serviceDesks.get(serverName);
 		if(serviceDesk==null)
 			return false;
+		/**
+		 * TODO: should postoffice authenticate the client? Check serviceDesk.authentication .
+		 */
 		serviceDesk.addClient(client);
 		return true;
 	}
@@ -41,6 +47,7 @@ public class PostOffice{
 	}
 	private boolean processRequest(Postman postman){
 		try{
+			//get non-encrypted request.
 			Object obj = postman.recv();
 			if(!(obj instanceof SecuString)){
 				System.err.println("Unexpected object of type "+obj.getClass().getName());
@@ -48,15 +55,48 @@ public class PostOffice{
 			}
 			SecuString secuString = (SecuString)obj;
 			String str = secuString.decrypt(null);
-			if(str.startsWith("CTRLEE REG REQ:")){
-				String CtrleeName = str.substring(15);
-				ServiceDesk serviceDesk = new ServiceDesk(postman);
+			
+			
+			if(str.startsWith("CTRLEE REG REQ AUTH:") || str.startsWith("CTRLEE REG REQ NAUT:")){
+				//if server requests to register at postoffice
+				boolean authentication = str.startsWith("CTRLEE REG REQ AUTH:");	//if server requires client authentication
+				String CtrleeName = str.substring(20);
+				//get server's name
+				ServerUserInfo serverUserInfo = Cfg.users.get(CtrleeName);
+				if(serverUserInfo==null){
+					//the server is not listed in postoffice config file
+					postman.send(new SecuString("CTRLEE REG ACK:You are not allowed to connect to me", null));
+					return false;
+				}
+				
+				//challenge server using its password.
+				if(!Challenger.challenge(postman, serverUserInfo)){
+					postman.send(new SecuString("CTRLEE REG ACK:You failed tp prove you are whom you claim to be", null));
+					return false;
+				}
+				//authentication succeeded. try to create service desk for the server.
+				ServiceDesk serviceDesk = new ServiceDesk(postman, authentication);
 				if(addServiceDesk(CtrleeName, serviceDesk)){
-					postman.send(new SecuString("CTRLEE REG ACK:OK", null));
+					postman.send(new SecuString("CTRLEE REG ACK:OK", serverUserInfo.password));
 				}
 				else{
-					postman.send(new SecuString("CTRLEE REG ACK:You've already registered", null));
+					postman.send(new SecuString("CTRLEE REG ACK:You've already registered.", serverUserInfo.password));
 				}
+				
+				//if server requires authentication, add client user info from server to postman.
+				if(authentication){
+					while(true){
+						obj = postman.recv();
+						if(!(obj instanceof SecuString))
+							return false;
+						secuString = (SecuString)obj;
+						str = secuString.decrypt(serverUserInfo.password);
+						if(str.equals("CLIENT LIST:END"))
+							break;
+						serviceDesk.addClientUserInfo(new ClientUserInfo(str));
+					}
+				}
+				System.out.println("Server "+serverUserInfo.username+" successfully registered at this postoffice.");
 			}
 			else if(str.startsWith("CTRLER REG REQ:")){
 				String CtrleeName = str.substring(15);
@@ -69,11 +109,20 @@ public class PostOffice{
 			}
 			else if(str.startsWith("CTRLEE DEREG REQ:")){
 				String CtrleeName = str.substring(17);
+				ServerUserInfo serverUserInfo = Cfg.users.get(CtrleeName);
+				if(serverUserInfo==null){
+					postman.send(new SecuString("CTRLEE DEREG ACK:You are not allowed to connect to me",null));
+					return false;
+				}
+				if(!Challenger.challenge(postman, serverUserInfo)){
+					return false;
+				}
 				if(closeServiceDesk(CtrleeName)){
+					System.out.println("Server "+serverUserInfo.username+" sussefully deregister at this postoffice.");
 					//server postman already closed
 				}
 				else{
-					postman.send(new SecuString("CTRLEE DEREG ACK:Your service name is not found", null));
+					postman.send(new SecuString("CTRLEE DEREG ACK:You are not registed", null));
 				}
 			}
 			else{
@@ -85,6 +134,7 @@ public class PostOffice{
 		}
 		return true;
 	}
+	
 	private void run(){
 		ServerSocket listener = null;
 		try {
@@ -95,7 +145,9 @@ public class PostOffice{
 				Thread thread = new Thread(){
 					@Override
 					public void run(){
-						processRequest(postman);
+						if(!processRequest(postman)){
+							postman.close();
+						}
 					}
 				};
 				thread.start();

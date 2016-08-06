@@ -2,14 +2,15 @@ package server;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import utils.ClientUserInfo;
 
 /**
  * Configuration of server (controllee). Most fields of this class are public and static in order
@@ -25,12 +26,13 @@ public class Cfg {
 	private static final String NL = System.getProperty("line.separator");
 	
 	protected static int port = 9001;				//server socket listener port
-	protected static List<UserInfo> users = new LinkedList<>();	//a list of user information
+	protected static HashMap<String,ClientUserInfo> users = new HashMap<>();	//a list of client user information
 	protected static boolean authenticate = true;	//whether authenticate user. should be identical to client side Cfg.
 	protected static boolean postoffice_register = true;		//whether register at post office.
 	protected static String postoffice_address = "127.0.0.1";	//postoffice address
 	protected static int postoffice_port = 9000;	//postoffice socket listener port
 	protected static String my_name = ""+((new Random()).nextInt());	//
+	protected static String my_password = "";							//used when register at postoffice.
 	
 	
 	
@@ -87,8 +89,8 @@ public class Cfg {
 					boolean allowaction = false;
 					try{allowaction = user.getBoolean("allow action");}
 					catch(Exception e){}
-					UserInfo userInfo = new UserInfo(username, password, allowaction);
-					users.add(userInfo);
+					ClientUserInfo userInfo = new ClientUserInfo(username, password, allowaction);
+					users.put(username,userInfo);
 				}
 				catch(Exception e){}
 			}
@@ -98,6 +100,7 @@ public class Cfg {
 		try {postoffice_address = json.getString("postoffice address");} catch (Exception e) {}
 		try {postoffice_port = json.getInt("postoffice port");} catch (Exception e) {}
 		try {my_name = json.getString("my name");} catch (Exception e) {}
+		try {my_password = json.getString("my password");} catch (Exception e) {}
 	}
 	
 	/**
@@ -109,32 +112,10 @@ public class Cfg {
 			"port: "					+	port			+	NL
 		+	"Number of user records: "	+	users.size()	+	NL
 		+	"authenticate: "			+	authenticate	+	NL
-		+	"postoffice address: "		+	postoffice_address	+	NL
+		+	"postoffice address: "		+	postoffice_address		+	NL
 		+	"postoffice port: "			+	postoffice_port	+	NL
 		+	"my name: "					+	my_name			+	NL
+		+	"my password's hashcode: "	+	my_password.hashCode()	+	NL
 		;
-	}
-}
-
-/**
- * User information including username and password. 
- * @author Kaiwen Sun
- *
- */
-class UserInfo{
-	public final String username;
-	public final String password;
-	public final boolean allowaction;
-	
-	/**
-	 * Constructor.
-	 * @param username username
-	 * @param password password
-	 * @param allowaction whether the user is allowed to conduct mouse and keyboard action
-	 */
-	public UserInfo(String username, String password, boolean allowaction){
-		this.username = username;
-		this.password = password;
-		this.allowaction = allowaction;
 	}
 }

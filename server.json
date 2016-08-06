@@ -16,5 +16,6 @@
 	"postoffice register": true,
 	"postoffice address": "127.0.0.1",
 	"postoffice port": 9000,
-	"my name": "Universe"
+	"my name": "Server Universe",
+	"my password": "Pa55w0rd"
 }

@@ -1,16 +1,21 @@
 package postoffice;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import utils.ClientUserInfo;
 import utils.Postman;
 
 public class ServiceDesk {
-	private final Postman server;
+	protected final Postman server;
 	private final List<PostmanPair> clients = new LinkedList<>();
-	public ServiceDesk(Postman server){
+	private HashMap<String, ClientUserInfo> clientUserInfos = new HashMap<>();
+	protected final boolean authentication;
+	public ServiceDesk(Postman server, boolean authentication){
 		this.server = server;
+		this.authentication = authentication;
 	}
 	public synchronized void addClient(Postman client){
 		PostmanPair pair = new PostmanPair(this.server, client);
@@ -35,5 +40,8 @@ public class ServiceDesk {
 			pair.controller.close();
 		}
 		server.close();
+	}
+	public void addClientUserInfo(ClientUserInfo clientUserInfo){
+		clientUserInfos.putIfAbsent(clientUserInfo.username, clientUserInfo);
 	}
 }
