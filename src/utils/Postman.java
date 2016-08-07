@@ -91,6 +91,11 @@ public class Postman {
 	 */
 	@Override
 	public String toString(){
-		return "postman at "+socket.toString();
+		try{
+			return "postman at "+socket.toString();
+		}
+		catch(NullPointerException e){
+			return "postman at unknown socket";
+		}
 	}
 }

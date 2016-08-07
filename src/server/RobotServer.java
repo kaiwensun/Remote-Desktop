@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import utils.MKEvent;
 import utils.Postman;
+import utils.SecuString;
 
 /**
  * Server receiving mouse and keyboard controlling message.
@@ -20,13 +21,16 @@ public class RobotServer implements Runnable {
 	private Postman postman;
 	private Robot robot;
 	private Dimension sz = Toolkit.getDefaultToolkit().getScreenSize();
+	private Server server;
 	
 	/**
 	 * Constructor.
 	 * @param postman postman
+	 * @param server 
 	 */
-	public RobotServer(Postman postman){
+	public RobotServer(Postman postman, Server server){
 		this.postman = postman;
+		this.server = server;
 		try {
 			robot = new Robot();
 		} catch (AWTException e) {
@@ -41,11 +45,36 @@ public class RobotServer implements Runnable {
 	@Override
 	public void run() {
 		try {
-			while(true){
+			while(!Thread.interrupted()){
 				try{
 					Object obj = postman.recv();
 					if(obj instanceof MKEvent){
 						doEvent((MKEvent)obj); 
+					}
+					else if(Cfg.postoffice_register && (obj instanceof SecuString)){
+						String str = ((SecuString)obj).decrypt(Cfg.my_password);
+						if (str.startsWith("IMAGE FETCHER:")){
+							String action = str.substring(14);
+							if(action.equals("START")){
+								//start video streaming
+								server.startVideoServer();
+								SecuString secuString = new SecuString("IMAGE FETCHER:OK", Cfg.my_password);
+								postman.send(secuString);
+							}
+							else if(action.equals("STOP")){
+								//stop video streaming
+								server.stopVideoServer();
+							}
+							else{
+								System.err.println("Message from "+postman+" is not understood ("+str+")");
+							}
+						}
+						else{
+							System.err.println("Message from "+postman+" is not understood ("+str+")");
+						}
+					}
+					else{
+						System.err.println("Unexpected object received from "+postman+"("+obj.getClass().getName()+")");
 					}
 				}
 				catch (IOException e) {

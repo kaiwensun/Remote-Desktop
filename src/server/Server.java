@@ -17,6 +17,8 @@ import utils.ServerUserInfo;
  */
 public class Server {
 	private int port = Cfg.port;
+	private Thread vst = new Thread();
+	private Postman postman;
 	
 	/**
 	 * Server (controllee) main entry.
@@ -32,30 +34,48 @@ public class Server {
 			server.runNonePostofficeMode();
 	}
 	
-	
+	protected void startVideoServer(){
+		synchronized (vst) {
+			if(vst.isAlive())
+				return;
+			Runnable vsr = new VideoServer(postman);
+			vst = new Thread(vsr);
+			vst.start();
+		}
+	}
+	protected void stopVideoServer(){
+		synchronized (vst) {
+			if(vst.isAlive()){
+				vst.interrupt();
+			}
+		}
+	}
 	private void buildConnectionWithClient(Postman postman, boolean allowaction){
+		allowaction = allowaction || Cfg.postoffice_register;
+		this.postman = postman;
 		Runnable vsr = new VideoServer(postman);
-		Thread vst = new Thread(vsr);
-		
+		vst = new Thread(vsr);
 		Thread rst = null;
 		if(allowaction){
-			Runnable rsr = new RobotServer(postman);
+			Runnable rsr = new RobotServer(postman, this);
 			rst = new Thread(rsr);
 		}
-		vst.start();
+		if(!Cfg.postoffice_register)
+			startVideoServer();
 		if(allowaction)
 			rst.start();
 		if(Cfg.postoffice_register){
 			//don't deregister until both threads stop.
 			try{
 				try {
-					vst.join();
-				} catch (InterruptedException e) {
-				}
-				try {
 					rst.join();
 				} catch (InterruptedException e) {
 				}
+				try {
+					vst.join();
+				} catch (InterruptedException e) {
+				}
+				
 			}
 			finally{	
 				if(deregisterAtPostoffice()){
@@ -88,7 +108,7 @@ public class Server {
 		ServerSocket listener = null;
 		try {
 			listener = new ServerSocket(port);
-			while(true){
+			while(!Thread.interrupted()){
 				Socket incoming = listener.accept();
 				Postman postman = new Postman(incoming);
 				boolean allowaction = true;

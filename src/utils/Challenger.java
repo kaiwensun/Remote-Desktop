@@ -48,8 +48,12 @@ public class Challenger {
 				return false;
 			SecuString secuString = (SecuString)obj;
 			String string = secuString.decrypt(userInfo.password);
+			if(string==null){
+				string = secuString.decrypt(null);
+			}
 			if(!string.startsWith(PREFIX)){
-				postman.send(new SecuString("Msg:I can't understand you.",null)); 
+				System.err.println("Unexpected message from postoffice ("+string+")");
+				postman.send(new SecuString("Msg:I can't understand you.",null));
 				return false;
 			}
 			SecuString reply = new SecuString(string.substring(PREFIX.length()), userInfo.password);
@@ -57,6 +61,7 @@ public class Challenger {
 			return true;
 		}
 		catch(Exception e){
+			e.printStackTrace();
 		}
 		return false;
 	}

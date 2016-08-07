@@ -16,6 +16,9 @@ public class MyPic extends Message implements Serializable {
  	private static final long serialVersionUID = -3381884330589371280L;
 	public transient BufferedImage image;
 
+	public MyPic(BufferedImage image){
+		this.image = image;
+	}
 	/**
 	 * Serialize to write out the object
 	 * @param out output stream

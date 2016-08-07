@@ -11,7 +11,7 @@ import utils.Postman;
 import utils.SecuString;
 import utils.ServerUserInfo;
 
-public class PostOffice{
+class PostOffice{
 	
 	private HashMap<String,ServiceDesk> serviceDesks = new HashMap<>();
 	
@@ -28,14 +28,16 @@ public class PostOffice{
 			return false;
 	}
 	
-	private boolean addClient(String serverName, Postman client){
+	private boolean addClient(Postman client, String serverName, String clientName){
 		ServiceDesk serviceDesk = serviceDesks.get(serverName);
 		if(serviceDesk==null)
 			return false;
-		/**
-		 * TODO: should postoffice authenticate the client? Check serviceDesk.authentication .
-		 */
-		serviceDesk.addClient(client);
+		ClientUserInfo clientUserInfo = serviceDesk.getClientUserInfo(clientName);
+		if(clientUserInfo==null)
+			return false;
+		if(!Challenger.challenge(client, clientUserInfo))
+			return false;
+		serviceDesk.addClient(clientUserInfo, client);
 		return true;
 	}
 	private boolean closeServiceDesk(String serverName){
@@ -57,9 +59,9 @@ public class PostOffice{
 			String str = secuString.decrypt(null);
 			
 			
-			if(str.startsWith("CTRLEE REG REQ AUTH:") || str.startsWith("CTRLEE REG REQ NAUT:")){
+			if(str.startsWith("CTRLEE REG REQ AUTH:")){
 				//if server requests to register at postoffice
-				boolean authentication = str.startsWith("CTRLEE REG REQ AUTH:");	//if server requires client authentication
+				boolean authentication = true;
 				String CtrleeName = str.substring(20);
 				//get server's name
 				ServerUserInfo serverUserInfo = Cfg.users.get(CtrleeName);
@@ -75,7 +77,7 @@ public class PostOffice{
 					return false;
 				}
 				//authentication succeeded. try to create service desk for the server.
-				ServiceDesk serviceDesk = new ServiceDesk(postman, authentication);
+				ServiceDesk serviceDesk = new ServiceDesk(postman, authentication, serverUserInfo);
 				if(addServiceDesk(CtrleeName, serviceDesk)){
 					postman.send(new SecuString("CTRLEE REG ACK:OK", serverUserInfo.password));
 				}
@@ -83,28 +85,29 @@ public class PostOffice{
 					postman.send(new SecuString("CTRLEE REG ACK:You've already registered.", serverUserInfo.password));
 				}
 				
-				//if server requires authentication, add client user info from server to postman.
-				if(authentication){
-					while(true){
-						obj = postman.recv();
-						if(!(obj instanceof SecuString))
-							return false;
-						secuString = (SecuString)obj;
-						str = secuString.decrypt(serverUserInfo.password);
-						if(str.equals("CLIENT LIST:END"))
-							break;
-						serviceDesk.addClientUserInfo(new ClientUserInfo(str));
-					}
+				//add client user info from server to postman.
+				while(true){
+					obj = postman.recv();
+					if(!(obj instanceof SecuString))
+						return false;
+					secuString = (SecuString)obj;
+					str = secuString.decrypt(serverUserInfo.password);
+					if(str.equals("CLIENT LIST:END"))
+						break;
+					serviceDesk.addClientUserInfo(new ClientUserInfo(str));
 				}
 				System.out.println("Server "+serverUserInfo.username+" successfully registered at this postoffice.");
 			}
-			else if(str.startsWith("CTRLER REG REQ:")){
-				String CtrleeName = str.substring(15);
-				if(addClient(CtrleeName, postman)){
+			else if(str.startsWith("CTRLER REG REQ:")){//CTRLER REG REQ:server name:client name
+				String[] fields = str.split(":");
+				String serverName = fields[1];
+				String clientName = fields[2];
+				if(addClient(postman, serverName, clientName)){
 					postman.send(new SecuString("CTRLER REG ACK:OK", null));
 				}
 				else{
-					postman.send(new SecuString("CTRLEFR REG ACK:Your server is not registered", null));
+					postman.send(new SecuString("CTRLEFR REG ACK:Your server is not registered or you are not allowed by server.", null));
+					return false;
 				}
 			}
 			else if(str.startsWith("CTRLEE DEREG REQ:")){
@@ -139,9 +142,10 @@ public class PostOffice{
 		ServerSocket listener = null;
 		try {
 			listener = new ServerSocket(Cfg.port);
-			while(true){
+			while(!Thread.interrupted()){
 				Socket incoming = listener.accept();
-				Postman postman = new Postman(incoming);
+				Postman new_postman = new Postman(incoming);
+				Postman postman = new_postman;
 				Thread thread = new Thread(){
 					@Override
 					public void run(){
@@ -156,7 +160,9 @@ public class PostOffice{
 			System.err.println("Can't open port "+Cfg.port);
 			return;
 		}
-		catch(Throwable throwable){}
+		catch(Throwable throwable){
+			throwable.printStackTrace();
+		}
 		finally{
 			if(listener!=null)
 				try {

@@ -15,7 +15,7 @@ public class VideoServer implements Runnable{
 	private Postman postman;
 	private static volatile Integer instanceCount = 0;
 	private static Thread captureThread;
-	private static BufferedImage image = new BufferedImage(1,1,BufferedImage.TYPE_BYTE_BINARY);;
+	private static BufferedImage image = new BufferedImage(1,1,BufferedImage.TYPE_BYTE_BINARY);
 	/**
 	 * Constructor.
 	 * @param postman postman used to communicate with user
@@ -50,7 +50,7 @@ public class VideoServer implements Runnable{
 			}
 		}
 		try {
-			while(true){
+			while(!Thread.interrupted()){
 				if(image==null){
 					try {
 						Thread.sleep(50);
@@ -59,8 +59,7 @@ public class VideoServer implements Runnable{
 					}
 					continue;
 				}
-				MyPic pic = new MyPic();
-				pic.image = image;
+				MyPic pic = new MyPic(image);
 				try{
 					postman.send(pic);
 				}

@@ -5,6 +5,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.Socket;
 
+import utils.Challenger;
+import utils.ClientUserInfo;
 import utils.MyPic;
 import utils.Postman;
 import utils.SecuString;
@@ -47,7 +49,7 @@ public class Client implements Runnable{
 				}
 			}
 			
-			if(Cfg.authenticate && !authenticate(postman)){
+			else if(Cfg.authenticate && !authenticate(postman)){
 				System.err.println("Login failed. Program exit.");
 				postman.close();
 				return;
@@ -129,8 +131,10 @@ public class Client implements Runnable{
 
 	private boolean registerAtPostoffice(Postman postman){
 		try {
-			SecuString string = new SecuString("CTRLER REG REQ:"+Cfg.controllee_name, null);	//controllee register request
+			SecuString string = new SecuString("CTRLER REG REQ:"+Cfg.controllee_name+":"+Cfg.username, null);	//controllee register request
 			postman.send(string);
+			if(!Challenger.solveChallenge(postman, new ClientUserInfo(Cfg.username,Cfg.password,Cfg.authenticate)))
+				return false;
 			Object obj = postman.recv();
 			if(!(obj instanceof SecuString))
 				return false;
