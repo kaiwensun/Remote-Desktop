@@ -1,4 +1,5 @@
 # Remote-Desktop
+This version is under development to deploy over internet. For the version can be used in local area network, please use the [released version v1.0](https://github.com/kaiwensun/Remote-Desktop/releases).
 
 ## Local Area Network Mode
 A remote computer GUI controller based on Java Robot.
